@@ -51,15 +51,18 @@
 # Creating an array that searches current dir, find and stores element in search_for_log_files 
 mapfile -t search_for_log_files < <(find . -name '*.log')
 
-echo -e "\nLog Analyzer - Analyze Keyword Errors in your Log Files"
-echo "======================================================="
-echo ""
-echo "Choose an option:"
-echo "1) Search for common errors keywords (ERROR, WARNING, FATAL, CRITICAL FAILED)"
-echo "2) Enter custom keywords"
-echo "3) Exit"
-echo ""
-read -p "Enter choice [1-3]: " choice
+# Creating a txt file to save reports in
+report_file="./analysis_report.txt"
+
+echo -e "\nLog Analyzer - Analyze Keyword Errors in your Log Files" 
+echo "=======================================================" 
+echo "" >> "$report_file"
+echo "Choose an option:" >> "$report_file" 
+echo "1) Search for common errors keywords (ERROR, WARNING, FATAL, CRITICAL FAILED)" 
+echo "2) Enter custom keywords" 
+echo "3) Exit" 
+echo "" 
+read -p "Enter choice [1-3]: " choice 
 
 # Displays Options for users to select from
 case $choice in
@@ -67,25 +70,25 @@ case $choice in
         keywords=("ERROR" "WARNING" "FATAL" "CRITICAL" "FAILED" )
         ;;
     2)
-        echo -e "\nEnter keywords you want to analyze for. (separate by spaces):"
+        echo -e "\nEnter keywords you want to analyze for. (separate by spaces):" 
         read -a keywords
         ;;
     3)
-        echo "Exiting..."
+        echo "Exiting..." 
         exit 0
         ;;
     *)  
-        echo "Invalid choice. Exiting..."
+        echo "Invalid choice. Exiting..." 
         exit 1
         ;;
 esac
 
-echo ""
+echo "" 
 echo "Searching for: ${keywords[@]}"
 
 # Using for loop and calling all element in search_for_log_files array to analyze them. 
 for file in "${search_for_log_files[@]}"; do
-    echo -e "\n=== Analyzing: $file ==="
+    echo -e "\n=== Analyzed: $file ===" >> "$report_file"
 
     # using loop to search through each keywords
     for keyword in "${keywords[@]}"; do
@@ -93,12 +96,14 @@ for file in "${search_for_log_files[@]}"; do
         keyword_error_count=$(grep -ic "$keyword" "$file")
         
         if [ $keyword_error_count -gt 0 ]; then
-            echo -e "\n=== $keyword Log for $file ===\n\n$keyword_error "
-            echo -e "\nNumber of $keyword found in $file : $keyword_error_count "
+            echo -e "\n=== $keyword Log for $file ===\n\n$keyword_error " >> "$report_file"
+            echo -e "\nNumber of $keyword found in $file : $keyword_error_count " >> "$report_file"
         else
-            echo -e "\nNo matches found for $keyword"
+            echo -e "\nNo matches found for $keyword" >> "$report_file"
         fi
     done
 done
 
-echo -e "\n========= End ========="
+echo -e "\n========= End =========" >> "$report_file"
+
+echo -e "\nLog analysis completed. Results saved in $report_file"
