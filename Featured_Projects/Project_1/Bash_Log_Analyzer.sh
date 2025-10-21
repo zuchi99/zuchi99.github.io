@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # # Version 1.0
 # # Creating an array that searches current dir and stores element in search_for_log_files 
 
@@ -56,8 +58,8 @@ report_file="./analysis_report.txt"
 
 echo -e "\nLog Analyzer - Analyze Keyword Errors in your Log Files" 
 echo "=======================================================" 
-echo "" >> "$report_file"
-echo "Choose an option:" >> "$report_file" 
+echo "" 
+echo "Choose an option:" 
 echo "1) Search for common errors keywords (ERROR, WARNING, FATAL, CRITICAL FAILED)" 
 echo "2) Enter custom keywords" 
 echo "3) Exit" 
@@ -70,7 +72,7 @@ case $choice in
         keywords=("ERROR" "WARNING" "FATAL" "CRITICAL" "FAILED" )
         ;;
     2)
-        echo -e "\nEnter keywords you want to analyze for. (separate by spaces):" 
+        echo -e "\nEnter keywords you want to analyze for. (separate with spaces): \n" 
         read -a keywords
         ;;
     3)
@@ -88,6 +90,27 @@ echo "Searching for: ${keywords[@]}"
 
 # Using for loop and calling all element in search_for_log_files array to analyze them. 
 for file in "${search_for_log_files[@]}"; do
+    echo -e "\n=== Analyzing: $file ===" 
+    sleep 3
+    
+    # using loop to search through each keywords
+    for keyword in "${keywords[@]}"; do
+        keyword_error=$(grep -i $keyword $file)
+        keyword_error_count=$(grep -ic "$keyword" "$file")
+        
+        if [ $keyword_error_count -gt 0 ]; then
+            echo -e "\n=== $keyword texts found in $file ===\n\n$keyword_error " 
+            echo -e "\nNumber of $keyword found in $file : $keyword_error_count "
+        else
+            echo -e "\nNo matches found for $keyword" 
+        fi
+    done
+done
+
+echo -e "\n========= End =========" 
+
+# Using for loop and calling all element in search_for_log_files array to analyze them. 
+for file in "${search_for_log_files[@]}"; do
     echo -e "\n=== Analyzed: $file ===" >> "$report_file"
 
     # using loop to search through each keywords
@@ -96,7 +119,7 @@ for file in "${search_for_log_files[@]}"; do
         keyword_error_count=$(grep -ic "$keyword" "$file")
         
         if [ $keyword_error_count -gt 0 ]; then
-            echo -e "\n=== $keyword Log for $file ===\n\n$keyword_error " >> "$report_file"
+            echo -e "\n=== $keyword texts found in $file ===\n\n$keyword_error " >> "$report_file"
             echo -e "\nNumber of $keyword found in $file : $keyword_error_count " >> "$report_file"
         else
             echo -e "\nNo matches found for $keyword" >> "$report_file"
