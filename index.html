@@ -63,6 +63,23 @@
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
         }
 
+        /* MOBILE MENU TOGGLE BUTTON - Only visible on mobile */
+        .menu-toggle {
+            display: none;  /* Hidden by default on desktop */
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+        }
+
+        /* Hamburger menu lines */
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
         /* LOGO STYLING - Creates gradient text effect */
         .logo {
             font-size: 1.5rem;
@@ -119,6 +136,7 @@
             justify-content: center;  /* Horizontal centering */
             
             padding: 2rem 5%;  /* Space around content */
+            padding-top: 120px;  /* Extra space at top to account for fixed navbar */
             position: relative;
         }
 
@@ -439,6 +457,41 @@
         /* ====== RESPONSIVE DESIGN ====== */
         /* These styles apply only on screens 768px wide or smaller (tablets/phones) */
         @media (max-width: 768px) {
+            /* Show hamburger menu button on mobile */
+            .menu-toggle {
+                display: flex;
+                z-index: 1001;
+            }
+
+            /* Hide navigation links by default on mobile */
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;  /* Hidden off-screen to the right */
+                height: 100vh;
+                width: 70%;
+                max-width: 300px;
+                background: rgba(15, 12, 41, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 2rem;
+                transition: right 0.3s ease;
+                box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+                padding: 2rem;
+            }
+
+            /* Show menu when active class is added */
+            .nav-links.active {
+                right: 0;  /* Slides in from right */
+            }
+
+            /* Make nav links larger on mobile menu */
+            .nav-links a {
+                font-size: 1.2rem;
+            }
+
             /* Makes main heading smaller on mobile */
             .hero h1 {
                 font-size: 2.5rem;
@@ -449,14 +502,14 @@
                 font-size: 1.2rem;
             }
 
+            /* Add more space before hero text on mobile */
+            .hero {
+                padding-top: 100px;
+            }
+
             /* Changes about section from 2 columns to 1 column on mobile */
             .about-content {
                 grid-template-columns: 1fr;  /* Single column layout */
-            }
-
-            /* Reduces space between navigation links on mobile */
-            .nav-links {
-                gap: 1rem;
             }
 
             /* Makes section titles smaller on mobile */
@@ -471,7 +524,14 @@
     <!-- Fixed at top, contains logo and menu links -->
     <nav id="navbar">
         <div class="logo">Ofomata's Portfolio</div>
-        <ul class="nav-links">
+        
+         <div class="menu-toggle" id="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <ul class="nav-links" id="nav-links">
             <!-- Each link uses # to link to sections by ID -->
             <li><a href="#home">Home</a></li>
             <li><a href="#about">About</a></li>
@@ -610,6 +670,36 @@
     </script>
 
     <script>
+        /* ====== MOBILE MENU TOGGLE FUNCTIONALITY ====== */
+        /* Handles opening/closing the mobile menu */
+        
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+        
+        // Toggle menu when hamburger is clicked
+        mobileMenu.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            
+            // Animate hamburger to X
+            mobileMenu.classList.toggle('active');
+        });
+        
+        // Close menu when a link is clicked
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            });
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navLinks.contains(e.target) && !mobileMenu.contains(e.target)) {
+                navLinks.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            }
+        });
+        
         /* ====== SMOOTH SCROLLING ====== */
         /* When clicking navigation links, smoothly scroll to target section instead of jumping */
         
